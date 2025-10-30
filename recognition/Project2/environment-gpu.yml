@@ -1,0 +1,21 @@
+name: comp3710-gpu
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pytorch=2.4
+  - torchvision=0.19
+  - pytorch-cuda=12.1  # pulls the right CUDA runtime for the env
+  - numpy=1.26
+  - nibabel=5.3
+  - scipy=1.13
+  - pillow=10.4
+  - matplotlib=3.9
+  - tqdm=4.66
+  - ipywidgets=8.1
+  - pip
+  - pip:
+      - notebook==7.2.1
+      - jupyterlab==4.2.5

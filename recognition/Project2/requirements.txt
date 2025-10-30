@@ -1,0 +1,16 @@
+# COMP3710 Final Project (PyTorch 2D Segmentation)
+# Python 3.11 + CUDA 12.x compatible
+
+torch==2.4.0
+torchvision==0.19.0
+numpy==1.26.4
+matplotlib==3.9.0
+nibabel==5.3.1
+scipy==1.13.1
+pillow==10.4.0
+tqdm==4.66.5
+ipywidgets==8.1.2
+
+# Optional (for Jupyter notebooks)
+notebook==7.2.1
+jupyterlab==4.2.5
