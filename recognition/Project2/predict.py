@@ -48,7 +48,77 @@ def get_args():
     ap.add_argument("--num_samples", type=int, default=9)
     ap.add_argument("--models_dir", default=os.path.join("models", "CAN_models"),
                     help="If --ckpt is not provided, will auto-pick newest best_* from this dir")
+    ap.add_argument("--max_test_slices", type=int, default=None,
+                help="If set, limit the number of test slices to this value (default: use all)")
+
     return ap.parse_args()
+
+@torch.no_grad()
+def show_samples(model, dataset, device, k=1):
+    model.eval()
+    plt.figure(figsize=(10, 4 * k))
+    for i in range(k):
+        img, seg = dataset[i]
+        logits = model(img.unsqueeze(0).to(device))
+        pred = torch.argmax(logits, dim=1).cpu().squeeze()
+
+        ax1 = plt.subplot(k, 3, 3*i + 1)
+        ax1.imshow(img.squeeze().numpy(), cmap='gray')
+        ax1.set_title(f"Input {i}")
+        ax1.axis('off')
+
+        ax2 = plt.subplot(k, 3, 3*i + 2)
+        ax2.imshow(seg.numpy(), cmap='jet')
+        ax2.set_title("Ground Truth")
+        ax2.axis('off')
+
+        ax3 = plt.subplot(k, 3, 3*i + 3)
+        ax3.imshow(pred.numpy(), cmap='jet')
+        ax3.set_title("Prediction")
+        ax3.axis('off')
+
+    plt.tight_layout()
+    plt.show()
+
+
+import matplotlib.pyplot as plt
+import torch
+
+@torch.no_grad()
+def scrollable_samples(model, dataset, device):
+    model.eval()
+    idx = [0]  # mutable index inside closure
+
+    print("\n🖱️ Use the mouse wheel to scroll through samples.\n")
+
+    fig, axes = plt.subplots(1, 3, figsize=(10, 4))
+    plt.subplots_adjust(wspace=0.05)
+
+    def draw(i):
+        img, seg = dataset[i]
+        logits = model(img.unsqueeze(0).to(device))
+        pred = torch.argmax(logits, dim=1).cpu().squeeze()
+
+        axes[0].imshow(img.squeeze().numpy(), cmap='gray')
+        axes[1].imshow(seg.numpy(), cmap='jet')
+        axes[2].imshow(pred.numpy(), cmap='jet')
+
+        for a, t in zip(axes, ["Input", "GT", "Pred"]):
+            a.set_title(f"{t} (slice {i})")
+            a.axis('off')
+        fig.canvas.draw_idle()
+
+    def on_scroll(event):
+        if event.button == 'up':
+            idx[0] = (idx[0] + 1) % len(dataset)
+        elif event.button == 'down':
+            idx[0] = (idx[0] - 1) % len(dataset)
+        draw(idx[0])
+
+    fig.canvas.mpl_connect('scroll_event', on_scroll)
+    draw(idx[0])
+    plt.show()
+
 
 if __name__ == "__main__":
     args = get_args()
@@ -59,6 +129,19 @@ if __name__ == "__main__":
     img_test = os.path.join(args.data_root, 'keras_slices_test')
     seg_test = os.path.join(args.data_root, 'keras_slices_seg_test')
     test_ds  = HipMRIDataset(img_test, seg_test, target_size=tuple(args.target_size))
+
+    '''# limit number of test slices (for debugging)
+    test_limit = 50   # choose any number
+    if len(test_ds) > test_limit:
+        test_ds = torch.utils.data.Subset(test_ds, range(test_limit))
+
+    '''
+    if args.max_test_slices is not None and len(test_ds) > args.max_test_slices:
+        test_ds = torch.utils.data.Subset(test_ds, range(args.max_test_slices))
+        print(f"[INFO] Using only first {args.max_test_slices} test slices out of {len(test_ds)} total.")
+
+
+
     test_dl  = DataLoader(test_ds, batch_size=args.batch_size, shuffle=False, num_workers=0)
     print("Test slices:", len(test_ds))
 
@@ -103,7 +186,34 @@ if __name__ == "__main__":
                         break
 
     mean_dice = total / max(1, n)
+
+    # --- final metric & optional saves ---
+    mean_dice = total / max(1, n)
+    print(f"TEST Dice (prostate): {mean_dice:.4f}")
+    if args.save_pngs: print("Saved PNG previews to ./preds/")
+    if args.save_niis: print("Saved NIfTI masks to ./preds_nii/ (resized space)")
+
+    # --- Optional visualisation (pop-up windows) ---
+    # (uses the show_samples() you defined above)
+    #show_samples(model, test_ds, device, k=10)
+    scrollable_samples(model, test_ds, device)
+
+    '''
+
     print(f"TEST Dice (prostate): {mean_dice:.4f}")
     if args.save_pngs: print("Saved PNG previews to ./preds/")
     if args.save_niis: print("Saved NIfTI masks to ./preds_nii/ (resized space)")
  
+
+    # --- after test Dice is printed ---
+    test_dice = evaluate_dice(model, test_loader)
+    print(f"TEST Dice (prostate): {test_dice:.4f}")
+
+    # --- Optional visualisation (pop-up windows) ---
+    import matplotlib.pyplot as plt
+    import torch
+
+
+    # Call the function
+    show_samples(model, test_ds, device, k=3)
+    '''
