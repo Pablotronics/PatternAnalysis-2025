@@ -1,0 +1,16 @@
+# Python caches
+__pycache__/
+*.pyc
+
+# Notebooks cache
+.ipynb_checkpoints/
+
+# Models & predictions (project-local)
+models/
+preds/
+preds_nii/
+*.pth
+
+# OS clutter
+.DS_Store
+Thumbs.db

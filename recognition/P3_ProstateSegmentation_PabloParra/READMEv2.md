@@ -7,9 +7,13 @@ python decompress_data.py
 # 2. Train the CAN model
 python Project2/train.py --data_root "C:\Users\User\Desktop\Final project comp3710"
 
+python recognition/P3_ProstateSegmentation_PabloParra/train.py --data_root "C:\Users\User\Desktop\Final project comp3710\keras_slices_data"
+
 
 # 3. Predict and visualise results
 python Project2/predict.py --data_root "C:\Users\User\Desktop\Final project comp3710\keras_slices_data" --save_pngs --num_samples 9
+python recognition/P3_ProstateSegmentation_PabloParra/predict.py --data_root "C:\Users\User\Desktop\Final project comp3710\keras_slices_data" --save_pngs --num_samples 9
+
 
 For first-time setup, follow the environment instructions in Section 2 below.
 
