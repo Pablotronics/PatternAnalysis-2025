@@ -2,6 +2,9 @@
 # Project 3 training script — trains U-Net + CAN on HipMRI 2D slices
 
 from pathlib import Path
+import matplotlib.pyplot as plt
+from pathlib import Path
+
 PROJECT_DIR = Path(__file__).resolve().parent
 
 # All artifacts live under the project folder:
@@ -80,6 +83,15 @@ if __name__ == "__main__":
     last_ckpt = os.path.join(args.out_dir, "unet2d_can_hipmri_last.pth")
     print("Will save best model to:", best_ckpt)
 
+    # Histories for plotting
+    hist_epochs, hist_train_loss, hist_train_dice, hist_val_dice = [], [], [], []
+
+    PLOTS_DIR = PROJECT_DIR / "plots"
+    PLOTS_DIR.mkdir(parents=True, exist_ok=True)
+
+
+
+
     # Train
     best_val_dice = -1.0
     for epoch in range(1, args.epochs + 1):
@@ -106,6 +118,48 @@ if __name__ == "__main__":
 
         print(f"Epoch {epoch:02d}/{args.epochs} | Train Loss {train_loss:.4f} | "
               f"Train Dice {train_dice:.4f} | Val Dice {val_dice:.4f} | Best {best_val_dice:.4f}")
+        hist_epochs.append(epoch)
+        hist_train_loss.append(train_loss)
+        hist_train_dice.append(train_dice)
+        hist_val_dice.append(val_dice)
+
+    
+
+
+
+    # --- Save history to CSV and plot ---
+    import csv
+    csv_path = PLOTS_DIR / "training_history.csv"
+    with open(csv_path, "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["epoch", "train_loss", "train_dice", "val_dice"])
+        for e, tl, td, vd in zip(hist_epochs, hist_train_loss, hist_train_dice, hist_val_dice):
+            w.writerow([e, tl, td, vd])
+    print(f"[INFO] Wrote history: {csv_path}")
+
+    plt.figure(figsize=(10,5))
+    plt.plot(hist_epochs, hist_train_loss, label="Train Loss")
+    plt.xlabel("Epoch"); plt.ylabel("Loss"); plt.grid(True, alpha=0.3)
+    ax2 = plt.twinx()
+    ax2.plot(hist_epochs, hist_train_dice, label="Train Dice", linestyle="--")
+    ax2.plot(hist_epochs, hist_val_dice, label="Val Dice", linestyle="-.")
+    ax2.set_ylabel("Dice")
+    lines_1, labels_1 = plt.gca().get_legend_handles_labels()
+    lines_2, labels_2 = ax2.get_legend_handles_labels()
+    plt.legend(lines_1 + lines_2, labels_1 + labels_2, loc="lower right")
+    plt.title("Training Curves (Loss & Dice)")
+    fig_path = PLOTS_DIR / "training_curves.png"
+    plt.tight_layout()
+    plt.savefig(fig_path, dpi=150)
+    plt.show()
+    print(f"[INFO] Saved plot: {fig_path}")
+
+    # Final test on best
+    print("\nReloading best and testing...")
+    state = torch.load(best_ckpt, map_location=device)
+
+
+
 
     # Final test on best
     print("\nReloading best and testing...")

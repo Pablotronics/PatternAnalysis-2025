@@ -9,6 +9,7 @@ __pycache__/
 models/
 preds/
 preds_nii/
+plots/
 *.pth
 
 # OS clutter

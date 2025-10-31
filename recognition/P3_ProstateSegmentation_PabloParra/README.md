@@ -1,35 +1,82 @@
-Quick Start
-Run the project in 3 simple steps
-# 1. Decompress the data
-python decompress_data.py
-
-
-# 2. Train the CAN model
-python Project2/train.py --data_root "C:\Users\User\Desktop\Final project comp3710"
-
-python recognition/P3_ProstateSegmentation_PabloParra/train.py --data_root "C:\Users\User\Desktop\Final project comp3710\keras_slices_data"
-
-
-# 3. Predict and visualise results
-python Project2/predict.py --data_root "C:\Users\User\Desktop\Final project comp3710\keras_slices_data" --save_pngs --num_samples 9
-python recognition/P3_ProstateSegmentation_PabloParra/predict.py --data_root "C:\Users\User\Desktop\Final project comp3710\keras_slices_data" --save_pngs --num_samples 9
-
-
-For first-time setup, follow the environment instructions in Section 2 below.
 
 # Project 3 — 2D Context-Aware Network (CAN) for Prostate Segmentation
 
-## 1. Project Overview
+Student: Pablo Parra
+ID: 43159996
+Course: COMP3710
 
-This project implements a **2D Context-Aware Network (CAN)** for medical image segmentation as part of *COMP3710: Pattern Analysis*. The dataset used is the **HipMRI Study on Prostate Cancer**, consisting of 2D axial MRI slices. The model aims to accurately segment the prostate region, targeting a **minimum Dice similarity coefficient of 0.75** on the test set.
+## 1. Project Overview and Objectives
 
-### 1.1 Objective
+Hi welcome to my implementation of project 3. This project implements a **2D Context-Aware Network (CAN)** for medical image segmentation as part of *COMP3710: Pattern Analysis*. The dataset used is the **HipMRI Study on Prostate Cancer**, consisting of 2D axial MRI slices. The model aims to accurately segment the prostate region, targeting a **minimum Dice similarity coefficient of 0.75** on the test set.
 
-The goal is to train and evaluate a deep learning model that performs robust segmentation on MRI slices of the prostate. The CAN model enhances the baseline U-Net architecture by incorporating *context modules* that expand the receptive field and integrate multi-scale feature aggregation, improving segmentation around prostate boundaries.
+
+The goal of the assignment was to solve a recognition problem of choice, and by doing so, work through the learning objective of the course. Hence, working thorugh this project was not only to learn about the pattern recognition topics, but to have first hand expeirence simulating what it is like to work as a member of a professional team, developing software with version control tools as GitHub and going through the process of designing a software package with all the necessary documentation and implementations so that it can run on other machines and can be integrated by other people.
+
+For the pattern recognition task, I first attempted project 2, which was easy (it is still inside the scraps folder in a jupiter notebook), but moved on to implement project 3. The goal of this task was to train and evaluate a 2D CAN model that performs robust segmentation on MRI slices of the prostate. The CAN model enhanced the baseline U-Net architecture by incorporating *context modules* that expand the receptive field and integrate multi-scale feature aggregation, improving segmentation around prostate boundaries.
+
+I managed to succesfully run the task of project 3 very quickly. This was not the most challenging part of the project, instead, the challenged lied in workingthrough the documentation, cleaning up the repository and designing a package structure thast would be easily implemented withminimal problems across a broad range of machines.
+
+## 1.2 How it all works in plain words - READ BEFORE TRYING ANYTHING
+
+Here I will explain a few things needed ot understand the whole package, no code here, as this will be provided after this high level explanation.
+
+### The virtual environment manager is conda
+The whole packages has a LOT of dependencies and libraries. To make it as reproducible as possible in a broad range of machines, I decided to set up a method for a virtual conda environment. Why conda and not venv, because I read that conda manages pytorch and pytorch verisons automatically. Hence after conda is installed, it should automatically manage which pytorch and cuda and python version are right for anyones individual machine. THis should save the hassles of pip installing one thing and then finding out that you do't have the right version to be compatible with another thing. the installation of conda is standarised and should be done by following this: https://www.youtube.com/watch?v=AgnAs0nPEVg&t=10s
+
+Once this is done, I have two yml file sin places which describe all the dependencies needed to run my implementation and these cna be run from bash, to install the whole environment. There are two environment files, I recommend using the environment-gpu.yml file, as this allows for intallation to be able to use CUDA GPUs. But there is a CPU only option (worse).
+
+Alternatively, if you are feeling adventurous, and just want to install directly from pip without any virtual environment, the dependencies are also listed on the requirements.txt file. This is NOT RECOMMENDED!
+
+### Source the data and one-time decompression
+
+The model is trained on the prostate images which are sources from rangpur or the web, exactly as outlined in the task sheet. Check section 1.3.3 and references. In short, the easy way to get the data is to log into Rangpur and download the data from the folder. Now, all the photos come in their own compressed folders, which only contain the one photo. This meant that they needed to be decompressed, only once, so that they sit not inside their own zip folder. To do this, I wrote a script called: decompress_data.py. Run this first, with the right file path.
+
+### Run train.py and then predict.py
+
+As specified, there is no model uploaded into the repo. So OF COURSE, you must run the training step at least once before there prediction step. Then, you can just run the rpediction step. Note that every time the training step is ran, is overwrites the previous one.
+
+### Gitignore in all things not specified to be in repo
+
+Note that all things that should not be in the repo, are marked ni the git ignore file, such as the models, the models generated by the train.py and the predicitons generated by the predict.py.
+
+### Training and Prediction arguments in terminal
+
+Note that the train and rpedict scripts allow for the specification of parameters by passing arguments in the terminal. Indeed, they need to be run form the terminal, with passing some key attributes.
+
+### Prediction GUI
+
+Note that the prediction step while it exports the images, it also runs a GUI that allows for scrolling throgh the samples. Closing this GUI kills the running of the script.
+
+### How to run (to follow in order)
+
+## Set up conda:
+# Clone the repository
+(this might change depending on where from we are cloning)
+https://github.com/Pablotronics/PatternAnalysis-2025.git
+cd PatternAnalysis-2025
+
+# Install conda by following:
+https://www.youtube.com/watch?v=AgnAs0nPEVg&t=10s
+
+# Create and activate Conda environment (GPU)
+conda env create -f environment-gpu.yml
+conda activate comp3710-gpu
+
+# (Alternative CPU-only environment)
+conda env create -f environment-cpu.yml
+conda activate comp3710-cpu
+```
+
+### Download data and decompress
+
+### Train for the first time
+
+### Run prediction step
+
 
 ### 1.2 Algorithm Summary
 
-* **Baseline:** U-Net (Project 2)
+* **Baseline:** U-Net (Project 2) (scraped - ignore)
 * **Improved Model:** 2D Context-Aware Network (CAN)
 
   * Adds parallel atrous (dilated) convolutions to capture multi-scale context.
@@ -51,6 +98,9 @@ A reproducible environment is provided using **Conda**.
 # Clone the repository
 https://github.com/Pablotronics/PatternAnalysis-2025.git
 cd PatternAnalysis-2025
+
+# Install coda by following:
+https://www.youtube.com/watch?v=AgnAs0nPEVg&t=10s
 
 # Create and activate Conda environment (GPU)
 conda env create -f environment-gpu.yml
@@ -81,6 +131,43 @@ python -c "import torch; print('CUDA available:', torch.cuda.is_available()); pr
 ```
 
 ---
+
+Quick Start
+Run the project in 3 simple steps
+# 1. Decompress the data
+
+python decompress_data.py
+
+This is a one-time preprocessing script.
+It takes your original compressed .nii.gz MRI volumes and extracts them into individual .nii or 2D slice files (depending on how you wrote it).
+
+You only need to run it once, at the very beginning, to prepare your dataset folder structure, e.g.:
+
+keras_slices_data/
+├── keras_slices_train/
+├── keras_slices_seg_train/
+├── keras_slices_validate/
+├── keras_slices_seg_validate/
+├── keras_slices_test/
+└── keras_slices_seg_test/
+
+
+After this has been generated, you don’t need to run it again unless you change or re-download the dataset.
+
+# 2. Train the CAN model
+python Project2/train.py --data_root "C:\Users\User\Desktop\Final project comp3710"
+
+python recognition/P3_ProstateSegmentation_PabloParra/train.py --data_root "C:\Users\User\Desktop\Final project comp3710\keras_slices_data"
+
+
+# 3. Predict and visualise results
+python Project2/predict.py --data_root "C:\Users\User\Desktop\Final project comp3710\keras_slices_data" --save_pngs --num_samples 9
+python recognition/P3_ProstateSegmentation_PabloParra/predict.py --data_root "C:\Users\User\Desktop\Final project comp3710\keras_slices_data" --save_pngs --num_samples 9
+
+
+For first-time setup, follow the environment instructions in Section 2 below.
+
+
 
 ## 3. Data Pre-processing
 
