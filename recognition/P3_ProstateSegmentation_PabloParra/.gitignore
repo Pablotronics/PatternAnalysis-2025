@@ -14,3 +14,14 @@ preds_nii/
 # OS clutter
 .DS_Store
 Thumbs.db
+
+# Ignore all model checkpoints and training outputs
+models/*
+preds/*
+preds_nii/*
+
+# Keep folder structure (if needed for repo layout)
+!models/.gitkeep
+!preds/.gitkeep
+!preds_nii/.gitkeep
+
