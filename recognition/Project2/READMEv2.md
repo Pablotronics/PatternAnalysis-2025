@@ -1,3 +1,18 @@
+Quick Start
+Run the project in 3 simple steps
+# 1. Decompress the data
+python decompress_data.py
+
+
+# 2. Train the CAN model
+python Project2/train.py --data_root "C:\Users\User\Desktop\Final project comp3710"
+
+
+# 3. Predict and visualise results
+python Project2/predict.py --data_root "C:\Users\User\Desktop\Final project comp3710\keras_slices_data" --save_pngs --num_samples 9
+
+For first-time setup, follow the environment instructions in Section 2 below.
+
 # Project 3 — 2D Context-Aware Network (CAN) for Prostate Segmentation
 
 ## 1. Project Overview
