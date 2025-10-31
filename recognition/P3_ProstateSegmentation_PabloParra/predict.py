@@ -68,7 +68,7 @@ def get_args():
 
     #ap.add_argument("--models_dir", default=os.path.join("models", "CAN_models"),
     #                help="If --ckpt is not provided, will auto-pick newest best_* from this dir")
-    ap.add_argument("--max_test_slices", type=int, default=None,
+    ap.add_argument("--max_test_slices", type=int, default=10,
                 help="If set, limit the number of test slices to this value (default: use all)")
 
     return ap.parse_args()
