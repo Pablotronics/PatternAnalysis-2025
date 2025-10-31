@@ -43,7 +43,7 @@ def get_args():
     ap = argparse.ArgumentParser(description="Train UNet+CAN on HipMRI 2D prostate segmentation")
     ap.add_argument("--data_root", required=True, help="Path to keras_slices_data folder")
     ap.add_argument("--epochs", type=int, default=2)
-    ap.add_argument("--batch_size", type=int, default=4)
+    ap.add_argument("--batch_size", type=int, default=4, help="This is how many images are processed at once per training step. Decrease is running out of VRAM")
     ap.add_argument("--lr", type=float, default=5e-4)
     ap.add_argument("--target_size", type=int, nargs=2, default=[256, 256], help="H W")
     ap.add_argument("--can_dilations", type=int, nargs="+", default=[1,2,4,8,16,32])
