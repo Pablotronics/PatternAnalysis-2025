@@ -1,5 +1,20 @@
 # predict.py
 # Project 3 prediction/evaluation script — loads a CAN checkpoint, evaluates, and optionally saves outputs
+
+from pathlib import Path
+PROJECT_DIR = Path(__file__).resolve().parent
+
+# All artifacts live under the project folder:
+MODELS_DIR   = PROJECT_DIR / "models" / "CAN_models"
+PREDS_DIR    = PROJECT_DIR / "preds"
+PREDS_NII_DIR= PROJECT_DIR / "preds_nii"
+
+MODELS_DIR.mkdir(parents=True, exist_ok=True)
+PREDS_DIR.mkdir(parents=True, exist_ok=True)
+PREDS_NII_DIR.mkdir(parents=True, exist_ok=True)
+
+
+
 import os, glob, argparse
 from pathlib import Path
 
@@ -46,8 +61,13 @@ def get_args():
     ap.add_argument("--save_pngs", action="store_true")
     ap.add_argument("--save_niis", action="store_true")
     ap.add_argument("--num_samples", type=int, default=9)
-    ap.add_argument("--models_dir", default=os.path.join("models", "CAN_models"),
-                    help="If --ckpt is not provided, will auto-pick newest best_* from this dir")
+    ap.add_argument("--models_dir", default=str(MODELS_DIR),
+                help="If --ckpt is not provided, auto-pick newest best_* from this dir")
+
+
+
+    #ap.add_argument("--models_dir", default=os.path.join("models", "CAN_models"),
+    #                help="If --ckpt is not provided, will auto-pick newest best_* from this dir")
     ap.add_argument("--max_test_slices", type=int, default=None,
                 help="If set, limit the number of test slices to this value (default: use all)")
 
@@ -176,10 +196,12 @@ if __name__ == "__main__":
                 for i in range(min(imgs.size(0), args.num_samples - saved)):
                     name_base = f"sample_{saved:03d}"
                     if args.save_pngs:
-                        out_png = os.path.join("preds", f"{name_base}.png")
+                        #out_png = os.path.join("preds", f"{name_base}.png")
+                        out_png = str(PREDS_DIR / f"{name_base}.png")
                         save_png_triplet(imgs[i].cpu(), segs[i].cpu(), preds[i], out_png)
                     if args.save_niis:
-                        out_nii = os.path.join("preds_nii", f"{name_base}.nii.gz")
+                        #out_nii = os.path.join("preds_nii", f"{name_base}.nii.gz")
+                        out_nii = str(PREDS_NII_DIR / f"{name_base}.nii.gz")
                         save_mask_nii(preds[i], out_nii)
                     saved += 1
                     if saved >= args.num_samples:

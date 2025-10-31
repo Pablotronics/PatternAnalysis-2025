@@ -1,5 +1,19 @@
 # train.py
 # Project 3 training script — trains U-Net + CAN on HipMRI 2D slices
+
+from pathlib import Path
+PROJECT_DIR = Path(__file__).resolve().parent
+
+# All artifacts live under the project folder:
+MODELS_DIR   = PROJECT_DIR / "models" / "CAN_models"
+PREDS_DIR    = PROJECT_DIR / "preds"
+PREDS_NII_DIR= PROJECT_DIR / "preds_nii"
+
+MODELS_DIR.mkdir(parents=True, exist_ok=True)
+PREDS_DIR.mkdir(parents=True, exist_ok=True)
+PREDS_NII_DIR.mkdir(parents=True, exist_ok=True)
+
+
 import os, time, argparse
 import torch
 import torch.nn as nn
@@ -33,7 +47,8 @@ def get_args():
     ap.add_argument("--lr", type=float, default=5e-4)
     ap.add_argument("--target_size", type=int, nargs=2, default=[256, 256], help="H W")
     ap.add_argument("--can_dilations", type=int, nargs="+", default=[1,2,4,8,16,32])
-    ap.add_argument("--out_dir", default=os.path.join("models", "CAN_models"))
+    # Route default outputs into this project folder
+    ap.add_argument("--out_dir", default=str(MODELS_DIR))
     return ap.parse_args()
 
 if __name__ == "__main__":
